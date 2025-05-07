@@ -168,11 +168,18 @@ void diffusion_initialsetup(String IC){
   SPI_write(selectedIC_CS, 0x1a, 0x00);
   SPI_write(selectedIC_CS, 0x19, 0x00);
   SPI_write(selectedIC_CS, 0x0a, 0x00);
-  SPI_write(selectedIC_CS, 0x09, 0x00);
+  SPI_write(selectedIC_CS, 0x09, 0x00); 
 
-  SPI_write(selectedIC_CS, 0x05, 0xf6);
-  SPI_write(selectedIC_CS, 0x15, 0xf6);
-    
+  delay(1000);
+
+  SPI_write(selectedIC_CS, 0x0a, 0x00);
+  SPI_write(selectedIC_CS, 0x1a, 0x00);
+
+  SPI_write(selectedIC_CS, 0x1a, 0x00);
+  SPI_write(selectedIC_CS, 0x19, 0x00);
+  SPI_write(selectedIC_CS, 0x0a, 0x00);
+  SPI_write(selectedIC_CS, 0x09, 0x00); 
+
   SPI.endTransaction();
 
   debugPrint("   ");
