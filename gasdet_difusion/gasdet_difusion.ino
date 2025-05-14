@@ -50,6 +50,8 @@
 String U1 = "u1";
 String U5 = "u5";
 
+int stripUsing = 0;
+
 String selectedIC = "u5";
 int selectedIC_CS = CS_U5; //starts with the U5
 
@@ -88,6 +90,17 @@ int getCommandNumber (String command) {
   else if (command.equals("manual op")) {
     return 1;
   }
+  else if (command.equals("aquisition")) {
+    return 3;
+  }
+  else if (command.startsWith("p")){
+    int num = command.substring(1).toInt();
+    if (num >= 1 && num <= 21){
+      return 300 + num;
+    }
+  }
+
+
   else if (command.equals("change ic")) {
     return 101;
   }
@@ -162,13 +175,13 @@ void diffusion_initialsetup(String IC){
   SPI_write(selectedIC_CS, 0x06, 0x00);
   SPI_write(selectedIC_CS, 0x16, 0x00);
   
-  SPI_write(selectedIC_CS, 0x0a, 0x00);
-  SPI_write(selectedIC_CS, 0x1a, 0x00);
+  SPI_write(selectedIC_CS, 0x0a, 0xff);
+  SPI_write(selectedIC_CS, 0x1a, 0xff);
 
-  SPI_write(selectedIC_CS, 0x1a, 0x00);
-  SPI_write(selectedIC_CS, 0x19, 0x00);
-  SPI_write(selectedIC_CS, 0x0a, 0x00);
-  SPI_write(selectedIC_CS, 0x09, 0x00); 
+  SPI_write(selectedIC_CS, 0x1a, 0xff);
+  SPI_write(selectedIC_CS, 0x19, 0xff);
+  SPI_write(selectedIC_CS, 0x0a, 0xff);
+  SPI_write(selectedIC_CS, 0x09, 0xff); 
 
   delay(1000);
 
@@ -276,7 +289,7 @@ void loop() {
   debugPrintln("=================================================================\n");
   
   debugPrintln("Available Commands:");
-  debugPrintln("\"initial setup\", \"manual op \", \" set op mode\"");
+  debugPrintln("\"initial setup\", \"manual op \", \" set op mode\",\" aquisition\"");
   // Wait for command
   debugPrint("Input command: ");
   while (!Serial.available());
@@ -371,5 +384,57 @@ void loop() {
   }
   else if (command_n == 2) {
     debugPrintln("Not yet implemented");
+  }
+  
+  else if (command_n == 3) {
+    if (stripUsing >= 1 && stripUsing <= 8){
+      byte _data = 0b00000000;
+      SPI_write(selectedIC_CS, translate_address("0x09"), _data);
+    }
+
+    else if (stripUsing >= 9 && stripUsing <= 16){
+      byte _data = 0b00000000;
+      SPI_write(selectedIC_CS, translate_address("0x19"), _data);
+    }
+
+    else if (stripUsing >= 17 && stripUsing <= 21){
+      byte _data = 0b00000000;
+      SPI_write(selectedIC_CS, translate_address("0x09"), _data);
+    }
+
+    debugPrintln("Which strip do you want to read? (format: pXX)");
+    while(!Serial.available());
+
+    String command_3 = Serial.readStringUntil('\n');
+    debugPrintln(command_3);
+    command_3.toLowerCase();
+
+    if (command_3.length()== 3){
+      int strip = command_3.substring(1).toInt();
+
+      if (strip >= 1 && strip <= 8){
+        set_selected_IC("u1");
+        
+        byte _data = 1 << (strip - 1);
+        stripUsing = strip;
+        SPI_write(selectedIC_CS, translate_address("0x09"), _data);
+      }
+
+      else if (strip >= 9 && strip <= 16){
+        set_selected_IC("u1");
+        
+        byte _data = 1 << (strip - 9);
+        stripUsing = strip;
+        SPI_write(selectedIC_CS, translate_address("0x19"), _data);
+      }
+
+      else if (strip >= 17 && strip <= 21){
+        set_selected_IC("u5");
+        
+        byte _data = 1 << (strip - 17);
+        stripUsing = strip;
+        SPI_write(selectedIC_CS, translate_address("0x09"), _data);
+      }
+    }
   }
 }
