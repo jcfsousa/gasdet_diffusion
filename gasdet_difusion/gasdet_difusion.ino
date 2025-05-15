@@ -412,53 +412,73 @@ void loop() {
   }
   
   else if (command_n == 3) {
-    if (stripUsing >= 1 && stripUsing <= 8){
-      byte _data = 0b00000000;
-      SPI_write(selectedIC_CS, translate_address("0x09"), _data);
-    }
+    debugPrintln("Enter strip to read (format: pXX), or type \"done\" to return:");
 
-    else if (stripUsing >= 9 && stripUsing <= 16){
-      byte _data = 0b00000000;
-      SPI_write(selectedIC_CS, translate_address("0x19"), _data);
-    }
+    while (true) {
+      debugPrintln("Which strip do you want to read? (format: pXX)");
+      while(!Serial.available());
+      String command_3 = Serial.readStringUntil('\n');
+      debugPrintln(command_3);
+      command_3.toLowerCase();
 
-    else if (stripUsing >= 17 && stripUsing <= 21){
-      byte _data = 0b00000000;
-      SPI_write(selectedIC_CS, translate_address("0x09"), _data);
-    }
-
-    debugPrintln("Which strip do you want to read? (format: pXX)");
-    while(!Serial.available());
-
-    String command_3 = Serial.readStringUntil('\n');
-    debugPrintln(command_3);
-    command_3.toLowerCase();
-
-    if (command_3.length()== 3){
-      int strip = command_3.substring(1).toInt();
-
-      if (strip >= 1 && strip <= 8){
-        set_selected_IC("u1");
-        
-        byte _data = 1 << stripBitPosition[strip];
-        stripUsing = strip;
-        SPI_write(selectedIC_CS, translate_address("0x09"), _data);
+      if (command_3.equals("done")) {
+        if (stripUsing >= 1 && stripUsing <= 8){
+          set_selected_IC("u1");
+          SPI_write(selectedIC_CS, translate_address("0x09"), 0x00);
+        }
+        else if (stripUsing >= 9 && stripUsing <= 16){
+          set_selected_IC("u1");
+          SPI_write(selectedIC_CS, translate_address("0x19"), 0x00);
+        }
+        else if (stripUsing >= 17 && stripUsing <= 21){
+          set_selected_IC("u5");
+          SPI_write(selectedIC_CS, translate_address("0x09"), 0x00);
+        }
+        stripUsing = 0;
+        debugPrintln("Returning to main menu...");
+        break;
       }
 
-      else if (strip >= 9 && strip <= 16){
-        set_selected_IC("u1");
-        
-        byte _data = 1 << stripBitPosition[strip];
-        stripUsing = strip;
-        SPI_write(selectedIC_CS, translate_address("0x19"), _data);
-      }
+      if (command_3.length()== 3 && command_3.charAt(0) == 'p'){
+        int strip = command_3.substring(1).toInt();
 
-      else if (strip >= 17 && strip <= 21){
-        set_selected_IC("u5");
-        
+        if (strip < 1 || strip > 21) {
+          debugPrintln("Invalid strip number. Please enter between p01 and p21.");
+          continue;
+        }
+
+        if (stripUsing >= 1 && stripUsing <= 8){
+          SPI_write(selectedIC_CS, translate_address("0x09"), 0x00);
+        }
+
+        else if (stripUsing >= 9 && stripUsing <= 16){
+          SPI_write(selectedIC_CS, translate_address("0x19"), 0x00);
+        }
+
+        else if (stripUsing >= 17 && stripUsing <= 21){
+          SPI_write(selectedIC_CS, translate_address("0x09"), 0x00);
+        }
+
         byte _data = 1 << stripBitPosition[strip];
         stripUsing = strip;
-        SPI_write(selectedIC_CS, translate_address("0x09"), _data);
+
+        if (strip >= 1 && strip <= 8){
+          set_selected_IC("u1");
+          SPI_write(selectedIC_CS, translate_address("0x09"), _data);
+        }
+
+        else if (strip >= 9 && strip <= 16){
+          set_selected_IC("u1");
+          SPI_write(selectedIC_CS, translate_address("0x19"), _data);
+        }
+
+        else{
+          set_selected_IC("u5");
+          SPI_write(selectedIC_CS, translate_address("0x09"), _data);
+        }
+      }
+      else {
+        debugPrintln("Invalid input. Use format pXX or type \"done\".");
       }
     }
   }
