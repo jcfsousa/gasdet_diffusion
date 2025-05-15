@@ -55,6 +55,31 @@ int stripUsing = 0;
 String selectedIC = "u5";
 int selectedIC_CS = CS_U5; //starts with the U5
 
+const byte stripBitPosition[22] = {
+  0,  // index 0 unused
+  1,  // strip 1 → bit 1
+  0,  // strip 2 → bit 0
+  3,  // strip 3 → bit 3
+  2,  // strip 4 → bit 2
+  5,  // strip 5 → bit 5
+  4,  // strip 6 → bit 4
+  7,  // strip 7 → bit 7
+  6,  // strip 8 → bit 6
+  1,  // strip 9 → bit 1
+  0,  // strip 10 → bit 0
+  3,  // strip 11 → bit 3
+  2,  // strip 12 → bit 2
+  5,  // strip 13 → bit 5
+  4,  // strip 14 → bit 4
+  7,  // strip 15 → bit 7
+  6,  // strip 16 → bit 6
+  1,  // strip 17 → bit 1
+  0,  // strip 18 → bit 0
+  3,  // strip 19 → bit 3
+  2,  // strip 20 → bit 2
+  5   // strip 21 → bit 5
+};
+
 
 void set_selected_IC(String selected_ic){
   if (selected_ic.equals("u1")){
@@ -415,7 +440,7 @@ void loop() {
       if (strip >= 1 && strip <= 8){
         set_selected_IC("u1");
         
-        byte _data = 1 << (strip - 1);
+        byte _data = 1 << stripBitPosition[strip];
         stripUsing = strip;
         SPI_write(selectedIC_CS, translate_address("0x09"), _data);
       }
@@ -423,7 +448,7 @@ void loop() {
       else if (strip >= 9 && strip <= 16){
         set_selected_IC("u1");
         
-        byte _data = 1 << (strip - 9);
+        byte _data = 1 << stripBitPosition[strip];
         stripUsing = strip;
         SPI_write(selectedIC_CS, translate_address("0x19"), _data);
       }
@@ -431,7 +456,7 @@ void loop() {
       else if (strip >= 17 && strip <= 21){
         set_selected_IC("u5");
         
-        byte _data = 1 << (strip - 17);
+        byte _data = 1 << stripBitPosition[strip];
         stripUsing = strip;
         SPI_write(selectedIC_CS, translate_address("0x09"), _data);
       }
