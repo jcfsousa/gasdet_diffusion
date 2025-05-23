@@ -124,6 +124,10 @@ int getCommandNumber (String command) {
       return 300 + num;
     }
   }
+  else if (command.equals("all on")) {
+    return 4;
+  }
+  
 
 
   else if (command.equals("change ic")) {
@@ -481,5 +485,12 @@ void loop() {
         debugPrintln("Invalid input. Use format pXX or type \"done\".");
       }
     }
+  }
+  else if (command_n == 4) {
+    set_selected_IC(U1);
+    SPI_write(selectedIC_CS, translate_address("0x09"), 0xff);
+    SPI_write(selectedIC_CS, translate_address("0x19"), 0xff);
+    set_selected_IC(U5);
+    SPI_write(selectedIC_CS, translate_address("0x09"), translate_address("0x2f"));
   }
 }
