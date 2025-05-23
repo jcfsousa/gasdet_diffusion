@@ -311,16 +311,16 @@ void setup() {
 }
 
 void loop() {
+  debugPrintln("------------------------------------------------------------");
+  debugPrintln("|                    AVAILABLE COMMANDS                    |");
+  debugPrintln("------------------------------------------------------------");
+  debugPrintln("  • \"initial setup\"   - Perform initial configuration");
+  debugPrintln("  • \"manual op\"       - Enter manual operation mode");
+  debugPrintln("  • \"set op mode\"     - Change the operation mode");
+  debugPrintln("  • \"aquisition\"      - Start data acquisition");
 
-  debugPrintln("=================================================================");
-  debugPrint("Selected IC: ");
-  debugPrintln(selectedIC);
-  debugPrintln("=================================================================\n");
-  
-  debugPrintln("Available Commands:");
-  debugPrintln("\"initial setup\", \"manual op \", \" set op mode\",\" aquisition\"");
-  // Wait for command
-  debugPrint("Input command: ");
+  debugPrintln("------------------------------------------------------------");
+  debugPrint(">> Input command: ");
   while (!Serial.available());
 
   String command = Serial.readStringUntil('\n');  
@@ -333,7 +333,6 @@ void loop() {
 
   // Perform Initial Setup
   if (command_n == 0) {
-
     debugPrintln("Performing Initial Setup...");
     arduino_initialsetup();
     diffusion_initialsetup("u1");
@@ -416,10 +415,14 @@ void loop() {
   }
   
   else if (command_n == 3) {
-    debugPrintln("Enter strip to read (format: pXX), or type \"done\" to return:");
-
     while (true) {
-      debugPrintln("Which strip do you want to read? (format: pXX)");
+      debugPrintln("------------------------------------------------------------");
+      debugPrintln("|                STRIP READ INPUT REQUIRED                 |");
+      debugPrintln("------------------------------------------------------------");
+      debugPrintln("Enter strip to read in the format: pXX");
+      debugPrintln("Type \"done\" to return to the previous menu.");
+      debugPrintln("------------------------------------------------------------");
+      debugPrint(">> Input: ");
       while(!Serial.available());
       String command_3 = Serial.readStringUntil('\n');
       debugPrintln(command_3);
